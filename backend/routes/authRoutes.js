@@ -11,7 +11,7 @@ const {
 
 // Public routes
 router.post('/register', registerValidation, AuthController.register);
-router.post('/login', authRateLimiter, loginValidation, AuthController.login);
+router.post('/login', loginValidation, AuthController.login);
 router.post('/refresh', refreshTokenValidation, AuthController.refresh);// Refresh access token
 
 router.post('/logout', AuthController.logout);

@@ -23,12 +23,6 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate, from]);
 
-  useEffect(() => {
-    return () => {
-      clearError();
-    };
-  }, [clearError]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -69,14 +63,15 @@ const Login = () => {
     }
 
     setLoading(true);
+    clearError(); // Clear any previous errors
 
-    try {
-      await login(formData);
+    await login(formData); // Call login - errors are handled in AuthContext
+
+    setLoading(false);
+
+    // If login was successful, navigate to dashboard
+    if (isAuthenticated) {
       navigate(from, { replace: true });
-    } catch (error) {
-      console.error('Login error:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -234,4 +229,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Login; 

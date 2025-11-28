@@ -38,15 +38,15 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       setLoading(true);
-      
+
       const response = await AuthService.login(credentials);
       const currentUser = AuthService.getCurrentUser();
       setUser(currentUser);
-      
+
       return response;
     } catch (error) {
-      setError(error.message || 'Login failed');
-      throw error;
+      const errorMessage = error?.message || 'Login failed. Please check your credentials.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -56,12 +56,12 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       setLoading(true);
-      
+
       const response = await AuthService.register(userData);
       return response;
     } catch (error) {
-      setError(error.message || 'Registration failed');
-      throw error;
+      const errorMessage = error?.message || 'Registration failed. Please check your credentials.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
