@@ -20,7 +20,7 @@ const Register = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
+      navigate('/dashboard', { replace: true });//to avoid login page when user is already login 
     }
   }, [isAuthenticated, navigate]);
 
@@ -77,7 +77,7 @@ const Register = () => {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors).length === 0;//if the newErrors object is empty, it returns true,that means no errors
   };
 
   const handleSubmit = async (e) => {

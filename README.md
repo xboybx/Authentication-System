@@ -1,52 +1,12 @@
-┌──────────────────────────────────────────────────────────┐
-│ 1. LOGIN                                                  │
-│ POST /login                                               │
-│ Body: { email, password }                                 │
-│                                                           │
-│ Response:                                                 │
-│ ├─ Short Token (15min) ← Use for API calls              │
-│ └─ Long Token (7days)  ← Save for later refreshing      │
-└──────────────────────────────────────────────────────────┘
-              ↓
-┌──────────────────────────────────────────────────────────┐
-│ 2. USE SHORT TOKEN                                        │
-│ GET /profile                                              │
-│ Headers: { Authorization: "Bearer short_token" }          │
-│                                                           │
-│ 15 minutes later...                                       │
-│ ❌ Short token expired!                                   │
-└──────────────────────────────────────────────────────────┘
-              ↓
-┌──────────────────────────────────────────────────────────┐
-│ 3. REFRESH (Get New Short Token)                         │
-│ POST /refresh                                             │
-│ Body: { refreshToken: "long_token" }                      │
-│                                                           │
-│ You SEND: Long token (7d) ───────────────┐               │
-│                                           │               │
-│ You GET:                                  │               │
-│ ├─ NEW Short Token (15min) ◄──────────── WHY /refresh?   │
-│ └─ NEW Long Token (7days)                 │               │
-│                                           │               │
-│ "Refresh" means: Use long token to       │               │
-│                  REFRESH the short token ┘               │
-└──────────────────────────────────────────────────────────┘
-              ↓ (Repeat every 15min)
-┌──────────────────────────────────────────────────────────┐
-│ 4. LOGOUT                                                 │
-│ POST /logout                                              │
-│ Body: { refreshToken: "long_token" }                      │
-│                                                           │
-│ Server marks long token as REVOKED                        │
-│ → Can't refresh anymore                                   │
-│ → Must login again                                        │
-└──────────────────────────────────────────────────────────┘
-
-
-
 # Secure Authentication System
 
 A production-ready authentication system built with Node.js, Express.js, React, and MongoDB featuring JWT tokens, refresh token mechanism, and comprehensive security measures.
+
+## Links
+
+🔗 **GitHub Repository**: [https://github.com/yourusername/secure-auth-system](https://github.com/yourusername/secure-auth-system)
+
+🚀 **Live Demo**: [https://secure-auth-demo.vercel.app](https://secure-auth-demo.vercel.app)
 
 ## Features
 
@@ -139,6 +99,51 @@ A production-ready authentication system built with Node.js, Express.js, React, 
 │
 └── README.md
 ```
+
+## Flow of the auth Tokens 
+┌──────────────────────────────────────────────────────────┐
+│ 1. LOGIN                                                  │
+│ POST /login                                               │
+│ Body: { email, password }                                 │
+│                                                           │
+│ Response:                                                 │
+│ ├─ Short Token (15min) ← Use for API calls              │
+│ └─ Long Token (7days)  ← Save for later refreshing      │
+└──────────────────────────────────────────────────────────┘
+              ↓
+┌──────────────────────────────────────────────────────────┐
+│ 2. USE SHORT TOKEN                                        │
+│ GET /profile                                              │
+│ Headers: { Authorization: "Bearer short_token" }          │
+│                                                           │
+│ 15 minutes later...                                       │
+│ ❌ Short token expired!                                   │
+└──────────────────────────────────────────────────────────┘
+              ↓
+┌──────────────────────────────────────────────────────────┐
+│ 3. REFRESH (Get New Short Token)                         │
+│ POST /refresh                                             │
+│ Body: { refreshToken: "long_token" }                      │
+│                                                           │
+│ You SEND: Long token (7d) ───────────────┐               │
+│                                           │               │
+│ You GET:                                  │               │
+│ ├─ NEW Short Token (15min) ◄──────────── WHY /refresh?   │
+│ └─ NEW Long Token (7days)                 │               │
+│                                           │               │
+│ "Refresh" means: Use long token to       │               │
+│                  REFRESH the short token ┘               │
+└──────────────────────────────────────────────────────────┘
+              ↓ (Repeat every 15min)
+┌──────────────────────────────────────────────────────────┐
+│ 4. LOGOUT                                                 │
+│ POST /logout                                              │
+│ Body: { refreshToken: "long_token" }                      │
+│                                                           │
+│ Server marks long token as REVOKED                        │
+│ → Can't refresh anymore                                   │
+│ → Must login again                                        │
+└──────────────────────────────────────────────────────────┘
 
 ## Installation & Setup
 
@@ -412,22 +417,7 @@ REACT_APP_ENV=development
 - Check rate limit configuration
 - Review IP whitelist
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-This project is licensed under the MIT License.
-
 ## Support
 
 For issues and questions:
-1. Check the troubleshooting section
-2. Review the documentation
-3. Open an issue in the repository
-4. Contact the development team
+ mailto:jeswanth0127@gmail.com
