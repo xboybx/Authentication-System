@@ -20,6 +20,7 @@ const Dashboard = () => {
       setError(null);
 
       const response = await AuthService.getProfile();
+      // console.log('Dashboard profile:', response.data.user.avatar);
       setProfile(response.data.user);
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -94,6 +95,7 @@ const Dashboard = () => {
 
   const displayUser = profile || user;
 
+
   return (
     <div className="max-w-[1400px] w-full mx-auto px-7 py-4">
       <div className="w-full mx-auto p-5 rounded-2xl border animate-slideUp"
@@ -120,6 +122,10 @@ const Dashboard = () => {
             style={{ color: 'var(--text-primary)' }}>
             <UserRound /> User Information
           </h3>
+          {/*AVATAR IMAGE */}
+          <span>  {displayUser?.avatar && (
+            <img src={displayUser.avatar} alt="User Avatar" className="w-20 h-20 rounded-lg ml-4 mb-4" />
+          )}</span>
           <p className="my-2 text-[0.9375rem] leading-relaxed"
             style={{ color: 'var(--text-secondary)' }}>
             <strong style={{ color: 'var(--text-primary)' }}>Name:</strong> {displayUser?.name}

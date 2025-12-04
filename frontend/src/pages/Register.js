@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Mail, KeyRound, OctagonAlert, RectangleEllipsis, User, Lock } from 'lucide-react';
+import { FcGoogle } from "react-icons/fc";
+import { signInWithPopup } from "firebase/auth";
+import { auth, providers } from '../utils/firebase.config';
+import AuthService from '../services/authService';
 
 
 const Register = () => {
@@ -15,7 +19,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const { register, isAuthenticated, error, clearError } = useAuth();
+  const { register, isAuthenticated, error, clearError, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +33,45 @@ const Register = () => {
       clearError();
     };
   }, [clearError]);
+
+  //Handling Google SignUP
+  const handleGoogleSignUp = async () => {
+    setLoading(true);
+    setSuccess(false);
+
+    try {
+      const result = await signInWithPopup(auth, providers);
+      const user = result.user;
+
+
+      const userData = {
+        name: user.displayName,
+        email: user.email,
+        googleId: user.uid,
+        avatar: user.photoURL,
+
+      };
+      const data = await AuthService.googleSignUp(userData);
+
+      if (data.success) {
+        googleLogin(data.data.user);//THIS IS THE USER DATA FOR AUTHENTICATION TO AUTH CONTEXT
+        setSuccess(true);
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
+      } else {
+        setErrors({ form: data.message || 'Google login failed' });
+      }
+
+
+    } catch (error) {
+      console.error('Google Sign Up Error:', error);
+      setErrors({ form: error.message || 'An error occurred during Google sign-up' });
+      setSuccess(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -147,7 +190,7 @@ const Register = () => {
           {/* Name Field */}
           <div className="mb-[18px]">
             <label htmlFor="name"
-              className="block mb-2 flex items-center gap-2 font-semibold text-xs tracking-wider uppercase"
+              className=" mb-2 flex items-center gap-2 font-semibold text-xs tracking-wider uppercase"
               style={{ color: 'var(--text-primary)' }}>
               <User size={12} /> Name
             </label>
@@ -282,7 +325,7 @@ const Register = () => {
           {/* Confirm Password Field */}
           <div className="mb-[18px]">
             <label htmlFor="confirmPassword"
-              className="block mb-2 flex items-center gap-2 font-semibold text-xs tracking-wider uppercase"
+              className=" mb-2 flex items-center gap-2 font-semibold text-xs tracking-wider uppercase"
               style={{ color: 'var(--text-primary)' }}>
               <Lock size={12} /> Confirm Password
             </label>
@@ -347,7 +390,30 @@ const Register = () => {
             }}>
             {loading ? ' Registering...' : ' Register'}
           </button>
+
         </form>
+        <button
+          type="button"
+          className="px-7 py-3.5 border rounded-xl text-base font-semibold cursor-pointer transition-all duration-[cubic-bezier(0.4,0,0.2,1)] no-underline inline-block font-sans tracking-wide relative overflow-hidden active:scale-95 hover:-translate-y-0.5 w-full mt-2.5"
+          disabled={loading}
+          style={{
+            background: 'var(--glass-bg)',
+            color: 'var(--text-primary)',
+            boxShadow: '0 8px 24px var(--shadow-color)',
+            borderColor: 'var(--glass-border)',
+            opacity: loading ? 0.6 : 1,
+            cursor: loading ? 'not-allowed' : 'pointer',
+            transform: loading ? 'none' : ''
+          }}
+          onClick={handleGoogleSignUp}
+        >
+          {loading ? "Signing up..." : (
+            <div className="flex items-center justify-center gap-2">
+              <FcGoogle size={24} />
+              <span>Sign up with Google</span>
+            </div>
+          )}
+        </button>
 
         <p className="mt-6 text-center"
           style={{ color: 'var(--text-secondary)' }}>
@@ -358,8 +424,8 @@ const Register = () => {
             Login here
           </Link>
         </p>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

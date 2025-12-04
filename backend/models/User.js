@@ -17,9 +17,23 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
+    // required: [true, 'Password is required'],
     minlength: [8, 'Password must be at least 8 characters'],
     select: false // Don't include password in queries by default
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true // Allows null values if not provided
+  },
+  authProvider: {
+    type: String,
+    enum: ['local', 'google'],
+    default: 'local'
+  },
+  avatar: {
+    type: String,
+
   },
   role: {
     type: String,
@@ -38,9 +52,9 @@ const userSchema = new mongoose.Schema({
 });
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-  
+
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
@@ -51,7 +65,7 @@ userSchema.pre('save', async function(next) {
 });
 
 // Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
   try {
     return await bcrypt.compare(candidatePassword, this.password);
   } catch (error) {
@@ -60,7 +74,7 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 };
 
 // Update last login
-userSchema.methods.updateLastLogin = async function() {
+userSchema.methods.updateLastLogin = async function () {
   this.lastLogin = new Date();
   await this.save();
 };

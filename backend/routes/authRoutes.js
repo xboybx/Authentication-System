@@ -22,4 +22,8 @@ router.get('/profile', authenticateToken, AuthController.getProfile);
 // Admin routes (for maintenance)
 router.delete('/cleanup-tokens', authenticateToken, AuthController.cleanupTokens);
 
+
+
+router.post("/google-signup", AuthController.googleSignUp);
+
 module.exports = router;

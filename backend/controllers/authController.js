@@ -5,6 +5,81 @@ const JWTUtils = require('../utils/jwt');
 const logger = require('../utils/logger');
 
 class AuthController {
+  //Google Sign Up
+  static async googleSignUp(req, res, next) {
+    try {
+      const { name, email, googleId, avatar } = req.body;
+      const ip = req.ip || req.connection.remoteAddress;
+
+      let user = await User.findOne({ googleId });
+      //check if the user alredy exists with this googleId
+      if (!user) {
+        //find the user by given email 
+        user = await User.findOne({ email });
+
+        if (user) {//link the google account
+          user.googleId = googleId;//we are creating these fiels if they don't exist -it means linking the google account
+          user.authProvider = 'google';
+          user.avatar = avatar;
+          await user.save();
+
+        } else {
+          //create a new user
+          user = new User({
+            name,
+            email,
+            googleId,
+            avatar,
+            authProvider: 'google'
+          })
+          await user.save();
+        }
+      }
+
+      // Update last login
+      await user.updateLastLogin();
+
+      //create Tokens
+      const tokenPayload = {
+        userId: user._id,
+        email: user.email,
+
+      };
+      const accessToken = JWTUtils.generateAccessToken(tokenPayload);//15MIN TOKEN
+      const refreshToken = JWTUtils.generateRefreshToken(tokenPayload);//7DAYS TOKEN
+
+
+      //SAVE REFRESH TOKEN TO THE DB
+
+      const refreshTokenDoc = new RefreshToken({
+        token: refreshToken,
+        user: user._id,
+        expiresAt: JWTUtils.getTokenExpiration(refreshToken),
+        createdByIp: ip,
+      });
+      await refreshTokenDoc.save();
+
+      const userResponse = user.toObject();
+
+      res.status(200).json({
+        success: true,
+        message: 'Login successful',
+        data: {
+          user: userResponse,
+          accessToken,
+          refreshToken
+        }
+      });
+
+
+    } catch (error) {
+      logger.error('Google Sign Up error:', error);
+      next(error);
+
+    }
+  }
+
+
   // User registration
   static async register(req, res, next) {
     try {

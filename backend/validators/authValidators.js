@@ -6,13 +6,13 @@ const registerValidation = [
     .notEmpty().withMessage('Name is required')
     .isLength({ min: 2, max: 50 }).withMessage('Name must be between 2 and 50 characters')
     .matches(/^[a-zA-Z\s]+$/).withMessage('Name can only contain letters and spaces'),
-  
+
   body('email')
     .trim()
     .notEmpty().withMessage('Email is required')
     .isEmail().withMessage('Please provide a valid email')
     .normalizeEmail(),
-  
+
   body('password')
     .notEmpty().withMessage('Password is required')
     .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
@@ -26,7 +26,7 @@ const loginValidation = [
     .notEmpty().withMessage('Email is required')
     .isEmail().withMessage('Please provide a valid email')
     .normalizeEmail(),
-  
+
   body('password')
     .notEmpty().withMessage('Password is required')
 ];
@@ -40,7 +40,7 @@ const refreshTokenValidation = [
 const changePasswordValidation = [
   body('currentPassword')
     .notEmpty().withMessage('Current password is required'),
-  
+
   body('newPassword')
     .notEmpty().withMessage('New password is required')
     .isLength({ min: 8 }).withMessage('New password must be at least 8 characters')
@@ -58,10 +58,25 @@ const updateProfileValidation = [
     .matches(/^[a-zA-Z\s]+$/).withMessage('Name can only contain letters and spaces')
 ];
 
+const googleLoginValidation = [
+  body('name')
+    .trim()
+    .notEmpty().withMessage('Name is required'),
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Email is required')
+    .isEmail().withMessage('Please provide a valid email')
+    .normalizeEmail(),
+  body('googleId')
+    .trim()
+    .notEmpty().withMessage('Google ID is required')
+];
+
 module.exports = {
   registerValidation,
   loginValidation,
   refreshTokenValidation,
   changePasswordValidation,
-  updateProfileValidation
+  updateProfileValidation,
+  googleLoginValidation
 };

@@ -42,7 +42,7 @@ api.interceptors.response.use(
           });
 
           const { accessToken, refreshToken: newRefreshToken } = response.data.data;
-          
+
           localStorage.setItem('accessToken', accessToken);
           if (newRefreshToken) {
             localStorage.setItem('refreshToken', newRefreshToken);
@@ -67,6 +67,26 @@ api.interceptors.response.use(
 );
 
 class AuthService {
+  //google signup
+
+  static async googleSignUp(userData) {
+    try {
+      const response = await api.post('/google-signup', userData)
+      const { data } = response.data
+
+      // Store tokens and user data
+      if (data.accessToken && data.refreshToken) {
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
+
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error;
+    }
+  }
+
   // User registration
   static async register(userData) {
     try {
@@ -82,14 +102,14 @@ class AuthService {
     try {
       const response = await api.post('/login', credentials);
       const { data } = response.data;
-      
+
       // Store tokens and user data
       if (data.accessToken && data.refreshToken) {
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
         localStorage.setItem('user', JSON.stringify(data.user));
       }
-      
+
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -106,14 +126,14 @@ class AuthService {
 
       const response = await api.post('/refresh', { refreshToken });
       const { data } = response.data;
-      
+
       if (data.accessToken) {
         localStorage.setItem('accessToken', data.accessToken);
         if (data.refreshToken) {
           localStorage.setItem('refreshToken', data.refreshToken);
         }
       }
-      
+
       return response.data;
     } catch (error) {
       throw error.response?.data || error;

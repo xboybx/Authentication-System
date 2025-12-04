@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Mail, KeyRound, OctagonAlert, RectangleEllipsis } from 'lucide-react';
+import { FcGoogle } from 'react-icons/fc';
+import { signInWithPopup } from "firebase/auth";
+import { auth, providers } from '../utils/firebase.config';
+import AuthService from '../services/authService';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,8 +14,9 @@ const Login = () => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const { login, isAuthenticated, error, clearError } = useAuth();
+  const { login, isAuthenticated, error, clearError, googleLogin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,6 +27,46 @@ const Login = () => {
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, from]);
+
+  //Handling GoogleSignup
+  const handleGoogleSignUp = async () => {
+    setLoading(true);
+    setSuccess(false);
+
+    try {
+      const result = await signInWithPopup(auth, providers);
+      const user = result.user;
+
+
+      const userData = {
+        name: user.displayName,
+        email: user.email,
+        googleId: user.uid,
+        avatar: user.photoURL,
+
+      };
+      const data = await AuthService.googleSignUp(userData);
+
+      if (data.success) {
+        googleLogin(data.data.user);//THIS IS THE USER DATA FOR AUTHENTICATION TO AUTH CONTEXT
+        setSuccess(true);
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
+      } else {
+        setErrors({ form: data.message || 'Google login failed' });
+      }
+
+
+    } catch (error) {
+      console.error('Google Sign Up Error:', error);
+      setErrors({ form: error.message || 'An error occurred during Google sign-up' });
+      setSuccess(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -214,6 +259,28 @@ const Login = () => {
             {loading ? ' Logging in...' : ' Login'}
           </button>
         </form>
+        <button
+          type="button"
+          className="px-7 py-3.5 border rounded-xl text-base font-semibold cursor-pointer transition-all duration-[cubic-bezier(0.4,0,0.2,1)] no-underline inline-block font-sans tracking-wide relative overflow-hidden active:scale-95 hover:-translate-y-0.5 w-full mt-2.5"
+          disabled={loading}
+          style={{
+            background: 'var(--glass-bg)',
+            color: 'var(--text-primary)',
+            boxShadow: '0 8px 24px var(--shadow-color)',
+            borderColor: 'var(--glass-border)',
+            opacity: loading ? 0.6 : 1,
+            cursor: loading ? 'not-allowed' : 'pointer',
+            transform: loading ? 'none' : ''
+          }}
+          onClick={handleGoogleSignUp}
+        >
+          {loading ? "Signing up..." : (
+            <div className="flex items-center justify-center gap-2">
+              <FcGoogle size={24} />
+              <span>Sign up with Google</span>
+            </div>
+          )}
+        </button>
 
         <p className="mt-6 text-center"
           style={{ color: 'var(--text-secondary)' }}>

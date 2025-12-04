@@ -67,6 +67,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const googleLogin = (userData) => {
+    setUser(userData);
+  };
+
   const logout = async () => {
     try {
       setLoading(true);
@@ -99,6 +103,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     login,
     register,
+    googleLogin,
     logout,
     updateUser,
     clearError
